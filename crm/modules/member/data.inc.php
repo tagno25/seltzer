@@ -112,7 +112,7 @@ function member_data ($opts = array()) {
         $sql = "
             SELECT
             `membership`.`sid`, `membership`.`cid`, `membership`.`start`, `membership`.`end`,
-            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`months`, `plan`.`active`, `plan`.`voting`
+            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`months`, `plan`.`active`, `plan`.`voting`, `plan`.`prorate`
             FROM `membership`
             INNER JOIN `plan` ON `plan`.`pid` = `membership`.`pid`
             WHERE `membership`.`cid`='$esc_cid'
@@ -136,7 +136,8 @@ function member_data ($opts = array()) {
                     'price' => $row['price'],
                     'months' => $row['months'],
                     'active' => $row['active'],
-                    'voting' => $row['voting']
+                    'voting' => $row['voting'],
+                    'prorate' => $row['prorate']
                 )
             );
             $members[$index]['membership'][] = $membership;
@@ -340,6 +341,7 @@ function member_plan_save ($plan) {
     $esc_months = mysql_real_escape_string($plan['months']);
     $esc_voting = mysql_real_escape_string($plan['voting']);
     $esc_active = mysql_real_escape_string($plan['active']);
+    $esc_prorate = mysql_real_escape_string($plan['prorate']);
     $esc_pid = mysql_real_escape_string($plan['pid']);
     if (isset($plan['pid'])) {
         // Update
@@ -350,7 +352,8 @@ function member_plan_save ($plan) {
                 `price`='$esc_price',
                 `months`='$esc_months',
                 `active`='$esc_active',
-                `voting`='$esc_voting'
+                `voting`='$esc_voting',
+                `prorate`='$esc_prorate'
             WHERE `pid`='$esc_pid'
         ";
         $res = mysql_query($sql);
@@ -359,9 +362,9 @@ function member_plan_save ($plan) {
         // Insert
         $sql = "
             INSERT INTO `plan`
-            (`name`,`price`, `months`, `voting`, `active`)
+            (`name`,`price`, `months`, `voting`, `active`, `prorate`)
             VALUES
-            ('$esc_name', '$esc_price', '$esc_months', '$esc_voting', '$esc_active')
+            ('$esc_name', '$esc_price', '$esc_months', '$esc_voting', '$esc_active', '$esc_prorate')
         ";
         $res = mysql_query($sql);
         if (!$res) crm_error(mysql_error());
@@ -452,7 +455,8 @@ function member_membership_data ($opts) {
                 'price' => $row['price'],
                 'months' => $row['months'],
                 'active' => $row['active'],
-                'voting' => $row['voting']
+                'voting' => $row['voting'],
+                'prorate' => $row['prorate']
             )
         );
         $row = mysql_fetch_assoc($res);

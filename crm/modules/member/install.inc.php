@@ -63,6 +63,7 @@ function member_install($old_revision = 0) {
               `months` tinyint(1) NOT NULL,
               `active` tinyint(1) NOT NULL,
               `voting` tinyint(1) NOT NULL,
+              `prorate` tinyint(1) NOT NULL,
               PRIMARY KEY (`pid`)
             ) ENGINE=MyISAM DEFAULT CHARSET=utf8 AUTO_INCREMENT=1 ;
         ';

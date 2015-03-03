@@ -127,6 +127,12 @@ function member_plan_add_form () {
                         'checked' => true
                     ),
                     array(
+                        'type' => 'checkbox',
+                        'label' => 'Prorate',
+                        'name' => 'prorate',
+                        'checked' => true
+                    ),
+                    array(
                         'type' => 'submit',
                         'value' => 'Add'
                     )
@@ -200,6 +206,12 @@ function member_plan_edit_form ($pid) {
                         'label' => 'Active',
                         'name' => 'active',
                         'checked' => $plan['active']
+                    ),
+                    array(
+                        'type' => 'checkbox',
+                        'label' => 'Prorate',
+                        'name' => 'prorate',
+                        'checked' => $plan['prorate']
                     ),
                     array(
                         'type' => 'submit',

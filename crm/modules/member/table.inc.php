@@ -237,6 +237,7 @@ function member_plan_table ($opts = NULL) {
         $table['columns'][] = array('title'=>'Months','class'=>'');
         $table['columns'][] = array('title'=>'Active','class'=>'');
         $table['columns'][] = array('title'=>'Voting','class'=>'');
+        $table['columns'][] = array('title'=>'Prorate','class'=>'');
         $table['columns'][] = array('title'=>'Ops','class'=>'');
     }
     
@@ -253,6 +254,7 @@ function member_plan_table ($opts = NULL) {
             $row[] = $plan['months'];
             $row[] = $plan['active'] ? 'Yes' : 'No';
             $row[] = $plan['voting'] ? 'Yes' : 'No';
+            $row[] = $plan['prorate'] ? 'Yes' : 'No';
         }
         
         // Construct ops array
