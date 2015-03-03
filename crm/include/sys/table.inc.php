@@ -190,7 +190,7 @@ function theme_table_csv ($table_name, $opts = NULL) {
     foreach ($table['columns'] as $col) {
         $cells[] = table_escape_csv($col['title']);
     }
-    $output .= join(',', $cells) . "\n";
+    $output = join(',', $cells) . "\n";
     
     // Loop through rows
     foreach ($table['rows'] as $row) {
