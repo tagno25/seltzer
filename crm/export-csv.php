@@ -25,6 +25,6 @@ $crm_root = dirname(__FILE__);
 // Bootstrap the crm
 require_once('include/crm.inc.php');
 
-header('Content-type: text/csv');
-header('Content-Disposition: attachment; filename="export.csv"');
-print theme('table_csv', $_GET['name'], json_decode($_GET['opts'], true));
+//header('Content-type: text/csv');
+//header('Content-Disposition: attachment; filename="export.csv"');
+print theme_table_csv($_GET['name'], json_decode($_GET['opts'], true));

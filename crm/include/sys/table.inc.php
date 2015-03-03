@@ -70,8 +70,25 @@ function theme_table ($table_id, $opts = NULL) {
     // Generate url for export
     $new_opts = $opts;
     $new_opts['export'] = true;
-    $export = 'export-csv.php?name=' . $table_id . '&opts=' . urlencode(json_encode($new_opts));
-    
+//
+    //$opts['show_export'] = true;
+//
+    if ($opts['show_export']) {
+        $export = 'export-csv.php?name=' . $table['name'] . '&opts=' . urlencode(json_encode($new_opts));
+    }
+
+/*    foreach($table as $k=>$variable_name) {
+         if (is_array($variable_name)){
+              foreach($variable_name as $i=>$variable_nam2) {
+                   foreach($variable_nam2 as $j=>$variable_nam3) {
+                        echo "<p> This is index of [$k][$i][$j]. value is $variable_nam3 <br/></p>";
+                   }
+              }
+         } else {
+             echo "<p> This is index of [$k]. value is $variable_name <br/></p>";
+         }
+    }*/
+
     // Open table
     $output = "<table";
     if (!empty($table['id'])) {
