@@ -811,6 +811,7 @@ function payment_method_options () {
     $options = array();
     $options['cash'] = 'Cash';
     $options['cheque'] = 'Cheque';
+    $options['credit'] = 'Credit Card';
     $options['other'] = 'Other';
     return $options;
 }

@@ -60,6 +60,7 @@ function member_install($old_revision = 0) {
               `pid` mediumint(8) unsigned NOT NULL AUTO_INCREMENT,
               `name` varchar(255) NOT NULL,
               `price` varchar(6) NOT NULL,
+              `months` tinyint(1) NOT NULL,
               `active` tinyint(1) NOT NULL,
               `voting` tinyint(1) NOT NULL,
               PRIMARY KEY (`pid`)

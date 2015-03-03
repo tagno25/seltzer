@@ -112,7 +112,7 @@ function member_data ($opts = array()) {
         $sql = "
             SELECT
             `membership`.`sid`, `membership`.`cid`, `membership`.`start`, `membership`.`end`,
-            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`active`, `plan`.`voting`
+            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`months`, `plan`.`active`, `plan`.`voting`
             FROM `membership`
             INNER JOIN `plan` ON `plan`.`pid` = `membership`.`pid`
             WHERE `membership`.`cid`='$esc_cid'
@@ -134,6 +134,7 @@ function member_data ($opts = array()) {
                     'pid' => $row['pid'],
                     'name' => $row['name'],
                     'price' => $row['price'],
+                    'months' => $row['months'],
                     'active' => $row['active'],
                     'voting' => $row['voting']
                 )
@@ -336,6 +337,7 @@ function member_plan_save ($plan) {
     
     $esc_name = mysql_real_escape_string($plan['name']);
     $esc_price = mysql_real_escape_string($plan['price']);
+    $esc_months = mysql_real_escape_string($plan['months']);
     $esc_voting = mysql_real_escape_string($plan['voting']);
     $esc_active = mysql_real_escape_string($plan['active']);
     $esc_pid = mysql_real_escape_string($plan['pid']);
@@ -346,6 +348,7 @@ function member_plan_save ($plan) {
             SET
                 `name`='$esc_name',
                 `price`='$esc_price',
+                `months`='$esc_months',
                 `active`='$esc_active',
                 `voting`='$esc_voting'
             WHERE `pid`='$esc_pid'
@@ -356,9 +359,9 @@ function member_plan_save ($plan) {
         // Insert
         $sql = "
             INSERT INTO `plan`
-            (`name`,`price`, `voting`, `active`)
+            (`name`,`price`, `months`, `voting`, `active`)
             VALUES
-            ('$esc_name', '$esc_price', '$esc_voting', '$esc_active')
+            ('$esc_name', '$esc_price', '$esc_months', '$esc_voting', '$esc_active')
         ";
         $res = mysql_query($sql);
         if (!$res) crm_error(mysql_error());
@@ -447,6 +450,7 @@ function member_membership_data ($opts) {
                 'pid' => $row['pid'],
                 'name' => $row['name'],
                 'price' => $row['price'],
+                'months' => $row['months'],
                 'active' => $row['active'],
                 'voting' => $row['voting']
             )

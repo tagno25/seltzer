@@ -130,6 +130,7 @@ function command_member_plan_add () {
     $plan = array(
         'name' => $_POST['name']
         , 'price' => $_POST['price']
+        , 'months' => $_POST['months']
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
         , 'pid' => $_POST['pid']
@@ -158,6 +159,7 @@ function command_member_plan_update () {
     $plan = array(
         'name' => $_POST['name']
         , 'price' => $_POST['price']
+        , 'months' => $_POST['months']
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
         , 'pid' => $_POST['pid']
@@ -366,6 +368,7 @@ function command_member_import () {
             $plan = array(
                 'name' => $esc_plan_name
                 , 'price' => '0'
+                , 'months' => '1'
                 , 'voting' => '0'
                 , 'active' => '1'
                 , 'pid' => $_POST['pid']
@@ -491,6 +494,7 @@ function command_member_plan_import () {
         $plan = array(
             'name' => $row['planname']
             , 'price' => $row['price']
+            , 'months' => $row['months']
             , 'voting' => $row['voting'] ? '1' : '0'
             , 'active' => $row['active'] ? '1' : '0'
             , 'pid' => $row['pid']

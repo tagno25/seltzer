@@ -170,6 +170,9 @@ function theme_form ($form) {
     case 'checkbox':
         $output .= theme('form_checkbox', $form);
         break;
+    case 'number':
+        $output .= theme('form_number', $form);
+        break;
     case 'select':
         $output .= theme('form_select', $form);
         break;
@@ -369,6 +372,30 @@ function theme_form_password ($field) {
         $output .= '<label>' . $field['label'] . '</label>';
     }
     $output .= '<input type="password" name="' . $field['name'] . '"/>';
+    $output .= '</fieldset>';
+    return $output;
+}
+
+/**
+ * Themes a number field in a form.
+ *
+ * @param $field the number field.
+ * @return The themed html for the number field.
+ */
+function theme_form_number ($field) {
+    if (!array_key_exists('class', $field)) { $field['class'] = ''; }
+    $output = '<fieldset class="form-row ' . $field['class'] . '">';
+    if (!empty($field['label'])) {
+        $output .= '<label>' . $field['label'] . '</label>';
+    }
+    $output .= '<input type="number" name="' . $field['name'] . '"';
+    $output .= ' min="1"';
+    if (!empty($field['value'])) {
+        $output .= ' value="' . $field['value'] . '"';
+    } else {
+        $output .= ' value="1"';
+    }
+    $output .= '/>';
     $output .= '</fieldset>';
     return $output;
 }

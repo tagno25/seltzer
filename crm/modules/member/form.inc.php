@@ -111,6 +111,11 @@ function member_plan_add_form () {
                         'name' => 'price'
                     ),
                     array(
+                        'type' => 'number',
+                        'label' => 'Months',
+                        'name' => 'months'
+                    ),
+                    array(
                         'type' => 'checkbox',
                         'label' => 'Voting',
                         'name' => 'voting'
@@ -177,6 +182,12 @@ function member_plan_edit_form ($pid) {
                         'label' => 'Price',
                         'name' => 'price',
                         'value' => $plan['price']
+                    ),
+                    array(
+                        'type' => 'number',
+                        'label' => 'Months',
+                        'name' => 'months',
+                        'value' => $plan['months']
                     ),
                     array(
                         'type' => 'checkbox',
