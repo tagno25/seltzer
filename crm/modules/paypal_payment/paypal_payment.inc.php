@@ -640,3 +640,14 @@ function command_paypal_payment_contact_delete () {
 function theme_paypal_payment_admin () {
     return '<p><a href=' . crm_url('paypal-admin') . '>Administer</a></p>';
 }
+
+/**
+ * Return themed html for an paypal payment button.
+ * @param $cid The cid to create a button for.
+ * @param $params Options for the button.
+ * @return A string containing the themed html.
+ */
+function theme_paypal_payment_button($cid, $params = array()) {
+//look at amazon_patments module
+    return 'add payment button here!';//test
+}

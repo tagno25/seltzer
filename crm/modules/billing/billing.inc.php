@@ -189,12 +189,6 @@ function command_billing_email () {
             , 'description' => 'Membership Dues Payment'
         );
         $amount = payment_format_currency($balance);
-        if (function_exists('amazon_payment_revision')) {
-            $button1 = theme('amazon_payment_button', $cid, $params);
-        }
-        if (function_exists('paypal_payment_revision')) {
-            $button2 = theme('paypal_payment_button', $cid, $params);
-        }
         // Send email
         $to = $cidToContact[$cid]['email'];
         $subject = "[$config_site_title] Payment Due";
@@ -202,9 +196,15 @@ function command_billing_email () {
         $headers = "Content-type: text/html\r\nFrom: $from\r\n";
         $message = "<p>Hello,<br/><br/>Your current account balance is $amount.  To pay this balance using </p>";
         if (function_exists('amazon_payment_revision')) {
-            $message .= "<p>Amazon Payments, please click the button below.</p>$button1";
+            global $config_amazon_payment_access_key_id;
+            global $config_amazon_payment_secret;
+            if(!empty($config_amazon_payment_access_key_id)&&!empty($config_amazon_payment_secret)) {
+                $button1 = theme('amazon_payment_button', $cid, $params);
+                $message .= "<p>Amazon Payments, please click the button below.</p>$button1";
+            }
         }
         if (function_exists('paypal_payment_revision')) {
+            $button2 = theme('paypal_payment_button', $cid, $params);
             $message .= "<p>Paypal, please click the button below.</p>$button2";
         }
         $res = mail($to, $subject, $message, $headers);
@@ -332,8 +332,11 @@ function billing_days_remaining ($day_of_month, $date_info) {
  * $date_info A date, as returned by getdate().
  * $return The number of days in the same billing period as $date_info
  */
-function billing_days_in_period ($date_info) {
-    $days = cal_days_in_month(CAL_GREGORIAN, $date_info['mon'], $date_info['year']);
+function billing_days_in_period ($date_info, $months) {
+    $days = 0;
+    for ($i=0;$i<$months;$i++){
+        $days += cal_days_in_month(CAL_GREGORIAN, $date_info['mon']+$i, $date_info['year']);
+    }
     return $days;
 }
 
@@ -375,7 +378,7 @@ function theme_billing_first_month ($cid) {
     // Calculate fraction of the billing period
     $mship = end($contact['member']['membership']);
     $date = getdate(strtotime($mship['start']));
-    $period = billing_days_in_period($date);
+    $period = billing_days_in_period($date, $mship['plan']['months']);//remove comment and change seconf argument to months
     $day = $date['mday'];
     $fraction = ($period - $day + 1.0) / $period;
     // Get payment amount
@@ -383,17 +386,21 @@ function theme_billing_first_month ($cid) {
     $due['value'] = ceil($due['value'] * $fraction);
     $html .= $due['value'];
     // Create button
-    $html = "<fieldset><legend>First month prorated dues</legend>";
+    $html = "<fieldset><legend>First period's prorated dues</legend>";
     $params = array(
         'referenceId' => $cid
         , 'amount' => $due['code'] . ' ' . payment_format_currency($due, false) 
         , 'description' => 'Membership Dues Payment'
     );
     $amount = payment_format_currency($due);
-    $html .= "<p><strong>First month's dues:</strong> $amount</p>";
+    $html .= "<p><strong>First period's dues:</strong> $amount</p>";
     if ($due['value'] > 0) {
         if (function_exists('amazon_payment_revision')) {
-            $html .= theme('amazon_payment_button', $cid, $params);
+            global $config_amazon_payment_access_key_id;
+            global $config_amazon_payment_secret;
+            if(!empty($config_amazon_payment_access_key_id)&&!empty($config_amazon_payment_secret)) {
+                $html .= theme('amazon_payment_button', $cid, $params);
+            }
         }
         if (function_exists('paypal_payment_revision')) {
             $html .= theme('paypal_payment_button', $cid, $params);
@@ -421,7 +428,11 @@ function theme_billing_account_info ($cid) {
     if ($balance['value'] > 0) {
         $output .= "<p><strong>Outstanding balance:</strong> $amount</p>";
         if (function_exists('amazon_payment_revision')) {
-            $output .= theme('amazon_payment_button', $cid, $params);
+            global $config_amazon_payment_access_key_id;
+            global $config_amazon_payment_secret;
+            if(!empty($config_amazon_payment_access_key_id)&&!empty($config_amazon_payment_secret)) {
+                $output .= theme('amazon_payment_button', $cid, $params);
+            }
         }
         if (function_exists('paypal_payment_revision')) {
             $output .= theme('paypal_payment_button', $cid, $params);

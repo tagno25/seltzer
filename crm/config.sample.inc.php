@@ -53,6 +53,9 @@ $config_address3 = '';
 $config_town_city = '';
 $config_zipcode = '';
 
+// MOTD for main page
+$config_motd = '';
+
 // The hostname of the server
 $config_host = $_SERVER['SERVER_NAME'];
 
