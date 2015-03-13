@@ -186,6 +186,7 @@ function command_billing_email () {
         $params = array(
             'referenceId' => $cid
             , 'amount' => $balance['code'] . ' ' . payment_format_currency($balance, false) 
+            , 'amountPayPal' => payment_format_currency($balance, false)
             , 'description' => 'Membership Dues Payment'
         );
         $amount = payment_format_currency($balance);
@@ -204,8 +205,11 @@ function command_billing_email () {
             }
         }
         if (function_exists('paypal_payment_revision')) {
-            $button2 = theme('paypal_payment_button', $cid, $params);
-            $message .= "<p>Paypal, please click the button below.</p>$button2";
+            global $config_paypal_email;
+            if(!empty($config_paypal_email)){
+                $button2 = theme('paypal_payment_button', $cid, $params);
+                $message .= "<p>Paypal, please click the button below.</p>$button2";
+            }
         }
         $res = mail($to, $subject, $message, $headers);
     }
@@ -389,7 +393,8 @@ function theme_billing_first_month ($cid) {
     $html = "<fieldset><legend>First period's prorated dues</legend>";
     $params = array(
         'referenceId' => $cid
-        , 'amount' => $due['code'] . ' ' . payment_format_currency($due, false) 
+        , 'amount' => $due['code'] . ' ' . payment_format_currency($due, false)
+        , 'amountPayPal' => payment_format_currency($due, false)
         , 'description' => 'Membership Dues Payment'
     );
     $amount = payment_format_currency($due);
@@ -403,7 +408,10 @@ function theme_billing_first_month ($cid) {
             }
         }
         if (function_exists('paypal_payment_revision')) {
-            $html .= theme('paypal_payment_button', $cid, $params);
+            global $config_paypal_email;
+            if(!empty($config_paypal_email)){
+                $html .= theme('paypal_payment_button', $cid, $params);
+            }
         }
     }
     $html .= '</fieldset>';
@@ -421,6 +429,7 @@ function theme_billing_account_info ($cid) {
     $params = array(
         'referenceId' => $cid
         , 'amount' => $balance['code'] . ' ' . payment_format_currency($balance, false) 
+        , 'amountPayPal' => payment_format_currency($balance, false)
         , 'description' => 'Membership Dues Payment'
     );
     $output = '<div>';
@@ -435,7 +444,10 @@ function theme_billing_account_info ($cid) {
             }
         }
         if (function_exists('paypal_payment_revision')) {
-            $output .= theme('paypal_payment_button', $cid, $params);
+            global $config_paypal_email;
+            if(!empty($config_paypal_email)){
+                $output .= theme('paypal_payment_button', $cid, $params);
+            }
         }
     } else {
         $balance['value'] = -1*$balance['value'];

@@ -649,5 +649,56 @@ function theme_paypal_payment_admin () {
  */
 function theme_paypal_payment_button($cid, $params = array()) {
 //look at amazon_patments module
-    return 'add payment button here!';//test
+    global $config_paypal_email;
+    global $config_paypal_country;
+    global $config_currency_code;
+    global $config_host;
+    if (empty($config_paypal_email)) {
+        error_register('Missing PayPal Email');
+        return '';
+    }
+    $defaults = array(
+        'collectShippingAddress' => '1'
+        , 'collectNote' => '1'
+        , 'referenceId' => 'YourReferenceId'
+        , 'amount' => '1.1'
+        , 'description' => 'Test Widget'
+        , 'ipnUrl' => 'http://' . $config_host . base_path() . 'modules/paypal_payment/ipn.php'
+        , 'returnUrl' => 'http://' . $config_host . crm_url('contact', array('query'=>array('cid'=>$cid, 'tab'=>'account')))
+        , 'abandonUrl' => 'http://' . $config_host . crm_url('contact', array('query'=>array('cid'=>$cid, 'tab'=>'account')))
+        , 'paypalCountry' => 'US'
+    );
+
+    // Use defaults for parameters not specified
+    foreach ($defaults as $key => $value) {
+        if (!isset($params[$key])) {
+            $params[$key] = $value;
+        }
+    }
+
+    $params['currency'] = $config_currency_code;
+    $params['paypalEmail'] = $config_paypal_email;
+    $params['paypalCountry'] = $config_paypal_country;
+
+   $html = <<<EOF
+<form action="https://www.sandbox.paypal.com/cgi-bin/webscr" method="post" target="_top">
+<input type="hidden" name="cmd" value="_xclick">
+<input type="hidden" name="business" value="$params[paypalEmail]">
+<input type="hidden" name="lc" value="$params[paypalCountry]">
+<input type="hidden" name="item_name" value="$params[description]">
+<input type="hidden" name="item_number" value="$params[referenceId]">
+<input type="hidden" name="amount" value="$params[amountPayPal]">
+<input type="hidden" name="currency_code" value="$params[currency]">
+<input type="hidden" name="button_subtype" value="services">
+<input type="hidden" name="no_note" value="$params[collectNote]">
+<input type="hidden" name="no_shipping" value="$params[collectShippingAddress]">
+<input type="hidden" name="return" value="$params[returnUrl]">
+<input type="hidden" name="cancel_return" value="$params[abandonUrl]">
+<input type="hidden" name="bn" value="PP-BuyNowBF:btn_paynow_LG.gif:NonHosted">
+<input type="hidden" name="notify_url" value="$params[ipnUrl]">
+<input type="image" src="https://www.paypalobjects.com/en_US/i/btn/btn_paynow_LG.gif" border="0" name="submit" alt="PayPal - The safer, easier way to pay online!">
+<img alt="" border="0" src="https://www.paypalobjects.com/en_US/i/scr/pixel.gif" width="1" height="1">
+</form>
+EOF;
+    return $html;
 }
