@@ -292,7 +292,7 @@ function member_plan_data ($opts = array()) {
         }
     }
     if (!empty($opts['pid'])) {
-        $pid = mysql_real_escape_string($opts[pid]);
+        $pid = mysql_real_escape_string($opts['pid']);
         $sql .= " AND `plan`.`pid`='$pid' ";
     }
     
@@ -344,8 +344,8 @@ function member_plan_save ($plan) {
     $esc_voting = mysql_real_escape_string($plan['voting']);
     $esc_active = mysql_real_escape_string($plan['active']);
     $esc_prorate = mysql_real_escape_string($plan['prorate']);
-    $esc_pid = mysql_real_escape_string($plan['pid']);
     if (isset($plan['pid'])) {
+        $esc_pid = mysql_real_escape_string($plan['pid']);
         // Update
         $sql = "
             UPDATE `plan`

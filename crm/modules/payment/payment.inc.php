@@ -736,11 +736,15 @@ function payment_history_table ($opts) {
         $contact = '';
         if ($payment['credit_cid'] === $cid) {
             $payment = payment_invert_currency($payment);
-            $contact = $payment['debit'];
+            if (isset($payment['debit'])) {
+                $contact = $payment['debit'];
+            }
         } else {
-            $contact = $payment['credit'];
+            if (isset($payment['credit'])) {
+                $contact = $payment['credit'];
+            }
         }
-        
+
         $contactName = '';
         if (!empty($contact)) {
             $contactName = theme_contact_name($contact['cid']);
@@ -761,7 +765,7 @@ function payment_history_table ($opts) {
         $row[] = payment_format_currency($balance);
         $ops = '';
         if (user_access('payment_edit')) {
-            $ops .= '<a href=' . crm_url('payment&pmtid=' . $payment[pmtid]) . '>edit</a> ';
+            $ops .= '<a href=' . crm_url('payment&pmtid=' . $payment['pmtid']) . '>edit</a> ';
         }
         if (user_access('payment_delete')) {
             $ops .= '<a href=' . crm_url('delete&type=payment&id=' . $payment['pmtid']) . '>delete</a>';

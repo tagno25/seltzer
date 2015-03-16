@@ -368,14 +368,15 @@ error_log("find me!");
  */
 function billing_days_in_period ($date_info, $months) {
     $days = 0;
+
     for ($i=0;$i<$months;$i++){
-        $year=(int)(($date_info['mon']+$i)/12);
-        $month=$date_info['mon']+$i-($year*12);
+        $years=(int)(($date_info['mon']+$i)/12);
+        $month=$date_info['mon']+$i-($years*12);
         if($month==0){
             $month=12;
-            $year--;
+            $years--;
         }
-        $days += cal_days_in_month(CAL_GREGORIAN, $month, $date_info['year']+$year);
+        $days += cal_days_in_month(CAL_GREGORIAN, $month, ($date_info['year']+$years));
     }
     return $days;
 }
@@ -421,13 +422,15 @@ error_log("fix days so far in period");
     $mship = end($contact['member']['membership']);
     $date = getdate(strtotime($mship['start']));
     $period = billing_days_in_period($date, $mship['plan']['months']);
+    // Day to bill on
+    $day_of_period = $mship['plan']['startday'];
 //error_log(billing_days_remaining(356, $date_info, $mship['plan']['months']));
     $day = $date['mday'];
     if($mship['plan']['prorate']==1){
 	// originally
 	// $fraction = ($period - $day + 1.0) / $period;
 	// 
-        $fraction = (billing_days_remaining($day_of_period, $date_info, $mship['plan']['months']) + 1.0) / $period;
+        $fraction = (billing_days_remaining($day_of_period, $date, $mship['plan']['months']) + 1.0) / $period;
         $html = "<fieldset><legend>First period's prorated dues</legend>";
     } else {
         $fraction = 1;

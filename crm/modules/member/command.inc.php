@@ -127,6 +127,28 @@ function command_member_add () {
 function command_member_plan_add () {
     global $esc_post;
     
+    // Verify feilds
+    if (empty($_POST['name'])) {
+        error_register('Plan name cannot be empty');
+        return crm_url('plans');
+    }
+    if (empty($_POST['price'])) {
+        error_register('Plan price cannot be empty');
+        return crm_url('plans');
+    }
+    if (!isset($_POST['voting'])){
+        $_POST['voting'] = 0;
+    }    
+    if (!isset($_POST['active'])){
+        $_POST['active'] = 0;
+    }
+    if (!isset($_POST['prorate'])){
+        $_POST['prorate'] = 0;
+    }
+    if (empty($_POST['months'])){
+        $_POST['months'] = 1;
+    }
+
     $plan = array(
         'name' => $_POST['name']
         , 'price' => $_POST['price']
@@ -135,7 +157,6 @@ function command_member_plan_add () {
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
         , 'prorate' => $_POST['prorate'] ? '1' : '0'
-        , 'pid' => $_POST['pid']
     );
     
     // Verify permissions
@@ -157,7 +178,29 @@ function command_member_plan_add () {
  */
 function command_member_plan_update () {
     global $esc_post;
-    
+
+    // Verify feilds
+    if (empty($_POST['name'])) {
+        error_register('Plan name cannot be empty');
+        return crm_url('plans');
+    }
+    if (empty($_POST['price'])) {
+        error_register('Plan price cannot be empty');
+        return crm_url('plans');
+    }
+    if (!isset($_POST['voting'])){
+        $_POST['voting'] = 0;
+    }
+    if (!isset($_POST['active'])){
+        $_POST['active'] = 0;
+    }
+    if (!isset($_POST['prorate'])){
+        $_POST['prorate'] = 0;
+    }
+    if (empty($_POST['months'])){
+        $_POST['months'] = 1;
+    }
+
     $plan = array(
         'name' => $_POST['name']
         , 'price' => $_POST['price']

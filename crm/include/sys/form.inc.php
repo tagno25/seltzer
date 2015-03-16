@@ -60,13 +60,17 @@ function crm_get_form () {
  */
 function form_set_value ($field, $values) {
     // Set value if specified
-    $name = $field['name'];
-    if (isset($values[$name])) {
+    if (isset($field['name'])){    
+        $name = $field['name'];
+    }
+    if (isset($name) && isset($values[$name])) {
         $field['value'] = $values[$name];
     } else if (isset($field['value'])) {
         return $field;
-    } else {
+    } else if (isset($field['default'])){
         $field['value'] = $field['default'];
+    } else {
+        $field['value'] = '';
     }
     return $field;
 }
@@ -393,7 +397,7 @@ function theme_form_month ($field) {
     }
     $output .= '<input type="number" name="' . $field['name'] . '"';
     $output .= ' min="1"';
-    if (!empty($field['value'])) {
+    if (isset($field['value'])) {
         $output .= ' value="' . $field['value'] . '"';
     } else {
         $output .= ' value="1"';
@@ -417,7 +421,7 @@ function theme_form_number ($field) {
     }
     $output .= '<input type="number" name="' . $field['name'] . '"';
     $output .= ' min="0"';
-    if (!empty($field['value'])) {
+    if (isset($field['value'])) {
         $output .= ' value="' . $field['value'] . '"';
     } else {
         $output .= ' value="1"';
