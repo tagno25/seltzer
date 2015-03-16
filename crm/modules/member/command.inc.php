@@ -131,6 +131,7 @@ function command_member_plan_add () {
         'name' => $_POST['name']
         , 'price' => $_POST['price']
         , 'months' => $_POST['months']
+        , 'startday' => $_POST['startday']
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
         , 'prorate' => $_POST['prorate'] ? '1' : '0'
@@ -161,6 +162,7 @@ function command_member_plan_update () {
         'name' => $_POST['name']
         , 'price' => $_POST['price']
         , 'months' => $_POST['months']
+        , 'startday' => $_POST['startday']
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
         , 'prorate' => $_POST['prorate'] ? '1' : '0'
@@ -371,6 +373,7 @@ function command_member_import () {
                 'name' => $esc_plan_name
                 , 'price' => '0'
                 , 'months' => '1'
+                , 'startday' => '1'
                 , 'voting' => '0'
                 , 'active' => '1'
                 , 'prorate' => '1'
@@ -498,6 +501,7 @@ function command_member_plan_import () {
             'name' => $row['planname']
             , 'price' => $row['price']
             , 'months' => $row['months']
+            , 'startday' => $row['startday']
             , 'voting' => $row['voting'] ? '1' : '0'
             , 'active' => $row['active'] ? '1' : '0'
             , 'prorate' => $row['prorate'] ? '1' : '0'

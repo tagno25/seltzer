@@ -111,9 +111,14 @@ function member_plan_add_form () {
                         'name' => 'price'
                     ),
                     array(
-                        'type' => 'number',
+                        'type' => 'month',
                         'label' => 'Months',
                         'name' => 'months'
+                    ),
+                    array(
+                        'type' => 'number',
+                        'label' => 'Start Day',
+                        'name' => 'startday'
                     ),
                     array(
                         'type' => 'checkbox',
@@ -190,10 +195,16 @@ function member_plan_edit_form ($pid) {
                         'value' => $plan['price']
                     ),
                     array(
-                        'type' => 'number',
+                        'type' => 'month',
                         'label' => 'Months',
                         'name' => 'months',
                         'value' => $plan['months']
+                    ),
+                    array(
+                        'type' => 'number',
+                        'label' => 'Start Day',
+                        'name' => 'startday',
+                        'value' => $plan['startday']
                     ),
                     array(
                         'type' => 'checkbox',
@@ -560,7 +571,7 @@ function plan_import_form () {
         , 'fields' => array(
             array(
                 'type' => 'message'
-                , 'value' => '<p>To import plans, upload a csv.  The csv should have a header row with the following fields:</p><ul><li>Plan Name</li><li>Price</li><li>Active (Set to 1/0 signalling Y/N)</li><li>Voting (Set to 1/0 signalling Y/N)</li></ul>'
+                , 'value' => '<p>To import plans, upload a csv.  The csv should have a header row with the following fields:</p><ul><li>Plan Name</li><li>Price</li><li>Months (lenght of plan in months)</li><li>Start Day (day of plan to start billing on) (set to 0 for day of billing to be based upon join date)</li><li>Active (Set to 1/0 signalling Y/N)</li><li>Voting (Set to 1/0 signalling Y/N)</li></ul>'
             )
             , array(
                 'type' => 'file'

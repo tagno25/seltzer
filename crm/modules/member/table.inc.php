@@ -235,6 +235,7 @@ function member_plan_table ($opts = NULL) {
         $table['columns'][] = array('title'=>'Name','class'=>'');
         $table['columns'][] = array('title'=>'Price','class'=>'');
         $table['columns'][] = array('title'=>'Months','class'=>'');
+        $table['columns'][] = array('title'=>'Start Day','class'=>'');
         $table['columns'][] = array('title'=>'Active','class'=>'');
         $table['columns'][] = array('title'=>'Voting','class'=>'');
         $table['columns'][] = array('title'=>'Prorate','class'=>'');
@@ -252,6 +253,7 @@ function member_plan_table ($opts = NULL) {
             $row[] = $plan['name'];
             $row[] = $plan['price'];
             $row[] = $plan['months'];
+            $row[] = $plan['startday'];
             $row[] = $plan['active'] ? 'Yes' : 'No';
             $row[] = $plan['voting'] ? 'Yes' : 'No';
             $row[] = $plan['prorate'] ? 'Yes' : 'No';
