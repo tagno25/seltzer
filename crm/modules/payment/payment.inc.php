@@ -394,16 +394,30 @@ function payment_save ($payment) {
         return NULL;
     }
     // Sanitize input
-    $esc_pmtid = mysql_real_escape_string($payment['pmtid']);
+    if(isset($payment['pmtid'])) {
+        $esc_pmtid = mysql_real_escape_string($payment['pmtid']);
+    }
     $esc_date = mysql_real_escape_string($payment['date']);
     $esc_description = mysql_real_escape_string($payment['description']);
     $esc_code = mysql_real_escape_string($payment['code']);
     $esc_value = mysql_real_escape_string($payment['value']);
     $esc_credit = mysql_real_escape_string($payment['credit_cid']);
-    $esc_debit = mysql_real_escape_string($payment['debit_cid']);
+    if(isset($payment['debit_cid'])) {
+        $esc_debit = mysql_real_escape_string($payment['debit_cid']);
+    } else {
+        $esc_debit = '';
+    }
     $esc_method = mysql_real_escape_string($payment['method']);
-    $esc_confirmation = mysql_real_escape_string($payment['confirmation']);
-    $esc_notes = mysql_real_escape_string($payment['notes']);
+    if(isset($payment['confirmation'])) {
+        $esc_confirmation = mysql_real_escape_string($payment['confirmation']);
+    } else {
+        $esc_confirmation = '';
+    }
+    if(isset($payment['notes'])) {
+        $esc_notes = mysql_real_escape_string($payment['notes']);
+    } else {
+        $esc_notes = '';
+    }
     // Query database
     if (array_key_exists('pmtid', $payment) && !empty($payment['pmtid'])) {
         // Payment already exists, update

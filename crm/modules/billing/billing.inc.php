@@ -266,15 +266,18 @@ function billing_page (&$page_data, $page_name, $options) {
 function billing_bill_membership ($membership, $until, $after = '') {
     $price = payment_parse_currency($membership['plan']['price']);
     $price['value'] *= -1;
+    $months = $membership['plan']['months'];
     // Day to bill on
     $day_of_period = $membership['plan']['startday'];
     // if the day to bill on is greater than there are days, then bill on first day
-    if ($day_of_period>billing_days_in_period(getdate($begin), $membership['plan']['months'])){
+    if ($day_of_period>billing_days_in_period(getdate(strtotime("+1 days")), $months)){
+        $day_of_period=1;
+    } elseif ($day_of_period==0 && $membership['plan']['prorate']== 1) {
         $day_of_period=1;
     }
+
     if ($day_of_period==0){
         $after='';
-error_log("Does this make billing based upon start date?");
     }
     $until_date = strtotime($until);
     $membership_start = strtotime($membership['start']);
@@ -287,7 +290,7 @@ error_log("Does this make billing based upon start date?");
         // Membership started before first billable date
         // Find first billing period starting after $after
         $begin = strtotime($after . ' +1 day');
-        $days = billing_days_remaining($day_of_period, getdate($begin), $membership['plan']['months']);
+        $days = billing_days_remaining($day_of_period, getdate($begin), $months);
         $period_start = strtotime("+$days days", $begin);
     }
     // Check for partial month and bill prorated
@@ -310,7 +313,7 @@ error_log("Does this make billing based upon start date?");
         );
         payment_save($payment);
         // Advance to beginning of first full period
-        $days = billing_days_remaining($day_of_period, $period_info, $membership['plan']['months']);
+        $days = billing_days_remaining($day_of_period, $period_info, $months);
         $period_start = strtotime("+$days days", $period_start);
     }
     // Bill each full billing period
@@ -325,7 +328,7 @@ error_log("Does this make billing based upon start date?");
         );
         payment_save($payment);
         // Advance to next billing period
-        $period_start = strtotime('+1 month', $period_start);
+        $period_start = strtotime("+$months month", $period_start);
     }
 }
 
@@ -426,10 +429,11 @@ error_log("fix days so far in period");
     $day_of_period = $mship['plan']['startday'];
 //error_log(billing_days_remaining(356, $date_info, $mship['plan']['months']));
     $day = $date['mday'];
-    if($mship['plan']['prorate']==1){
+    if($mship['plan']['prorate']==1 && $day_of_period!=0){
 	// originally
 	// $fraction = ($period - $day + 1.0) / $period;
-	// 
+	//
+error_log("fix this");
         $fraction = (billing_days_remaining($day_of_period, $date, $mship['plan']['months']) + 1.0) / $period;
         $html = "<fieldset><legend>First period's prorated dues</legend>";
     } else {
