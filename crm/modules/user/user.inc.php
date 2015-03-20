@@ -934,7 +934,7 @@ function command_user_role_update () {
     // Re-add each role
     $roles = user_role_data();
     foreach ($roles as $role) {
-        if ($_POST[$role['name']]) {
+        if (isset($_POST[$role['name']]) && $_POST[$role['name']]) {
             $esc_rid = mysql_real_escape_string($role['rid']);
             $sql = "
                 INSERT INTO `user_role`

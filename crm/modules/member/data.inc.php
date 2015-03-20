@@ -112,7 +112,7 @@ function member_data ($opts = array()) {
         $sql = "
             SELECT
             `membership`.`sid`, `membership`.`cid`, `membership`.`start`, `membership`.`end`,
-            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`months`, `plan`.`startday`, `plan`.`active`, `plan`.`voting`, `plan`.`prorate`
+            `plan`.`pid`, `plan`.`name`, `plan`.`price`, `plan`.`months`, `plan`.`baseday`, `plan`.`active`, `plan`.`voting`, `plan`.`prorate`
             FROM `membership`
             INNER JOIN `plan` ON `plan`.`pid` = `membership`.`pid`
             WHERE `membership`.`cid`='$esc_cid'
@@ -135,7 +135,7 @@ function member_data ($opts = array()) {
                     'name' => $row['name'],
                     'price' => $row['price'],
                     'months' => $row['months'],
-                    'startday' => $row['startday'],
+                    'baseday' => $row['baseday'],
                     'active' => $row['active'],
                     'voting' => $row['voting'],
                     'prorate' => $row['prorate']
@@ -340,7 +340,7 @@ function member_plan_save ($plan) {
     $esc_name = mysql_real_escape_string($plan['name']);
     $esc_price = mysql_real_escape_string($plan['price']);
     $esc_months = mysql_real_escape_string($plan['months']);
-    $esc_startday = mysql_real_escape_string($plan['startday']);
+    $esc_baseday = mysql_real_escape_string($plan['baseday']);
     $esc_voting = mysql_real_escape_string($plan['voting']);
     $esc_active = mysql_real_escape_string($plan['active']);
     $esc_prorate = mysql_real_escape_string($plan['prorate']);
@@ -353,7 +353,7 @@ function member_plan_save ($plan) {
                 `name`='$esc_name',
                 `price`='$esc_price',
                 `months`='$esc_months',
-                `startday`='$esc_startday',
+                `baseday`='$esc_baseday',
                 `active`='$esc_active',
                 `voting`='$esc_voting',
                 `prorate`='$esc_prorate'
@@ -365,9 +365,9 @@ function member_plan_save ($plan) {
         // Insert
         $sql = "
             INSERT INTO `plan`
-            (`name`,`price`, `months`, `startday`, `voting`, `active`, `prorate`)
+            (`name`,`price`, `months`, `baseday`, `voting`, `active`, `prorate`)
             VALUES
-            ('$esc_name', '$esc_price', '$esc_months', '$esc_startday', '$esc_voting', '$esc_active', '$esc_prorate')
+            ('$esc_name', '$esc_price', '$esc_months', '$esc_baseday', '$esc_voting', '$esc_active', '$esc_prorate')
         ";
         $res = mysql_query($sql);
         if (!$res) crm_error(mysql_error());
@@ -457,7 +457,7 @@ function member_membership_data ($opts) {
                 'name' => $row['name'],
                 'price' => $row['price'],
                 'months' => $row['months'],
-                'startday' => $row['startday'],
+                'baseday' => $row['baseday'],
                 'active' => $row['active'],
                 'voting' => $row['voting'],
                 'prorate' => $row['prorate']

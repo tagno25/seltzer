@@ -111,14 +111,16 @@ function member_plan_add_form () {
                         'name' => 'price'
                     ),
                     array(
-                        'type' => 'month',
+                        'type' => 'number',
                         'label' => 'Months',
-                        'name' => 'months'
+                        'name' => 'months',
+                        'minimum' => '1'
                     ),
                     array(
-                        'type' => 'number',
-                        'label' => 'Start Day',
-                        'name' => 'startday'
+                        'type' => 'text',
+                        'label' => 'Base Day',
+                        'name' => 'baseday',
+                        'class' => 'date'
                     ),
                     array(
                         'type' => 'checkbox',
@@ -195,16 +197,18 @@ function member_plan_edit_form ($pid) {
                         'value' => $plan['price']
                     ),
                     array(
-                        'type' => 'month',
+                        'type' => 'number',
                         'label' => 'Months',
                         'name' => 'months',
-                        'value' => $plan['months']
+                        'value' => $plan['months'],
+                        'minimum' => '1'
                     ),
                     array(
-                        'type' => 'number',
-                        'label' => 'Start Day',
-                        'name' => 'startday',
-                        'value' => $plan['startday']
+                        'type' => 'text',
+                        'label' => 'Base Day',
+                        'name' => 'baseday',
+                        'class' => 'date',
+                        'value' => $plan['baseday']
                     ),
                     array(
                         'type' => 'checkbox',

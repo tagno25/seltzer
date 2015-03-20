@@ -262,23 +262,12 @@ function billing_page (&$page_data, $page_name, $options) {
  * @param $membership The membership to bill.
  * @param $until Bill up to and including this day.
  * @param $after Start billing after this day or beginning of time if not given.
- */
+ lling_bill_membership*/
 function billing_bill_membership ($membership, $until, $after = '') {
     $price = payment_parse_currency($membership['plan']['price']);
     $price['value'] *= -1;
     $months = $membership['plan']['months'];
-    // Day to bill on
-    $day_of_period = $membership['plan']['startday'];
-    // if the day to bill on is greater than there are days, then bill on first day
-    if ($day_of_period>billing_days_in_period(getdate(strtotime("+1 days")), $months)){
-        $day_of_period=1;
-    } elseif ($day_of_period==0 && $membership['plan']['prorate']== 1) {
-        $day_of_period=1;
-    }
 
-    if ($day_of_period==0){
-        $after='';
-    }
     $until_date = strtotime($until);
     $membership_start = strtotime($membership['start']);
     // Find first unbilled day
@@ -290,15 +279,15 @@ function billing_bill_membership ($membership, $until, $after = '') {
         // Membership started before first billable date
         // Find first billing period starting after $after
         $begin = strtotime($after . ' +1 day');
-        $days = billing_days_remaining($day_of_period, getdate($begin), $months);
-        $period_start = strtotime("+$days days", $begin);
+        $period_start = billing_period_start($membership, getdate($begin))['0'];
+        $period_start = strtotime("+".$months." months", $period_start);
     }
     // Check for partial month and bill prorated
     $period_info = getdate($period_start);
-    if ($period_info['mday'] != $day_of_period) {
+    if (billing_days_remaining($membership, $period_info) != billing_days_in_period ($membership, $period_info)) {
         if($membership['plan']['prorate']==1){
-            // Parital month, prorate
-            $prorated = billing_prorate($period_info, $day_of_period, $price);
+            // Parital month, prorate $membership, $date_info, $price
+            $prorated = billing_prorate($membership, $period_info, $price);
         } else {
             // Parital month, no prorate
             $prorated = $price;
@@ -313,7 +302,7 @@ function billing_bill_membership ($membership, $until, $after = '') {
         );
         payment_save($payment);
         // Advance to beginning of first full period
-        $days = billing_days_remaining($day_of_period, $period_info, $months);
+        $days = billing_days_remaining($membership, $period_info);
         $period_start = strtotime("+$days days", $period_start);
     }
     // Bill each full billing period
@@ -329,37 +318,58 @@ function billing_bill_membership ($membership, $until, $after = '') {
         payment_save($payment);
         // Advance to next billing period
         $period_start = strtotime("+$months month", $period_start);
+
     }
 }
 
 /**
+ * Find the start of the current billing period.
+ * $membership The membership info for the user.
+ * $date_info A date, as returned by getdate().
+ */
+function billing_period_start ($membership, $date_info) {
+    $months = $membership['plan']['months'];
+    $date1 = new DateTime();
+    $date2 = new DateTime();
+    if($membership['plan']['baseday']=="0000-00-00"){
+        $baseday=$membership['start'];
+    } else {
+        $baseday=$membership['plan']['baseday'];
+    }
+    $date1 -> setTimestamp(strtotime($baseday));
+    $date2 -> setTimestamp($date_info['0']);
+    $interval = date_diff($date1, $date2);
+    $periods=(int)((($interval->y*12)+$interval->m)/$months);
+    if ($periods==0) {
+        $period_start=strtotime($baseday);
+    } else {
+        $period_start=strtotime("+".($periods*$months)." month", strtotime($baseday));
+    }
+    return getdate($period_start);
+}
+
+/**
  * Find the number of days left in a billing period.
- * $day_of_period The day of the month billing periods begin on.
+ * $membership The membership info for the user.
  * $date_info A date, as returned by getdate().
  * $return The number of days remaining after $date_info.
  */
-function billing_days_remaining ($day_of_period, $date_info, $months) {
-//fix this!
-//days=days_in_period-days_since_start_of_period
-//days=days_in_period-days_till_end_of_period
-//error_log(billing_days_in_period($date_info, $months)%$date_info[yday]);
-//    $days = billing_days_in_period ($date_info, $months)-days_since_period_start();
-    if($day_of_period==0){
-        $days = billing_days_in_period ($date_info, $months);
-        return $days;
-    }
-    if($months==1){
-        $days = $day_of_period - $date_info['mday'];
+function billing_days_remaining ($membership, $date_info) {
+    $months = $membership['plan']['months'];
+    if($membership['plan']['baseday']=="0000-00-00"){
+        //if baseday is 0000-00-00, set days remaining to the entire period
+        $days = billing_days_in_period ($membership, $date_info);
     } else {
-$days=0;//tmp remove when working
-//$date_info['yday']
-//chose months based upon month joined.
-// if joined in june with a $months of 6 bill in december
-error_log("find me!");
-        //$days = billing_days_in_period ($date_info, $months) - $day_of_period - $date_info['yday'];
+        $period_start = billing_period_start($membership, $date_info);
+        $date1 = new DateTime();
+        $date2 = new DateTime();
+        $date1 -> setTimestamp($period_start['0']);
+        $date2 -> setTimestamp($date_info['0']);
+        $interval = date_diff($date1, $date2);
+        $days=billing_days_in_period ($membership, $date_info)-$interval->format('%a');
     }
     if ($days < 0) {
-        $days += billing_days_in_period ($date_info, $months);
+        $days += billing_days_in_period ($membership, $date_info);
     }
     return $days;
 }
@@ -369,46 +379,38 @@ error_log("find me!");
  * $date_info A date, as returned by getdate().
  * $return The number of days in the same billing period as $date_info
  */
-function billing_days_in_period ($date_info, $months) {
+function billing_days_in_period ($membership, $date_info) {
     $days = 0;
-
-    for ($i=0;$i<$months;$i++){
-        $years=(int)(($date_info['mon']+$i)/12);
-        $month=$date_info['mon']+$i-($years*12);
-        if($month==0){
-            $month=12;
-            $years--;
-        }
-        $days += cal_days_in_month(CAL_GREGORIAN, $month, ($date_info['year']+$years));
-    }
+    $months = $membership['plan']['months'];
+    $period_start = billing_period_start($membership, $date_info);
+    $period_end = strtotime("+".$months." month", $period_start['0']);
+    $date1 = new DateTime();
+    $date2 = new DateTime();
+    $date1 -> setTimestamp($period_start['0']);
+    $date2 -> setTimestamp($period_end);
+    $interval = date_diff($date1, $date2);
+    $days=$interval->format('%a');
     return $days;
 }
 
 /**
  * Calculate prorated billing amount.
+error_log("fix all @param");
  * @param $period_info Billing start date (as returned by getdate()).
  * @param $day_of_period The day of month billing periods start on.
  * @param $price Price array representing a full billing period.
  */
-function billing_prorate ($period_info, $day_of_period, $price) {
-//Fix to work for longer months?
-    $days_in_month = cal_days_in_month(CAL_GREGORIAN, $period_info['mon'], $period_info['year']);
-    $partial = $day_of_period - $period_info['mday'];
-    $ending_month = $period_info['mon'];
-    $ending_year = $period_info['year'];
-    if ($partial < 0) {
-        $partial += cal_days_in_month(CAL_GREGORIAN, $period_info['mon'], $period_info['year']);
+function billing_prorate ($membership, $date_info, $price) {
+    $due = $price['value'];
+    $period = billing_days_in_period($membership, $date_info);
+    if($membership['plan']['prorate']==1 && $membership['plan']['baseday']!="0000-00-00"){
+        $fraction = (billing_days_remaining($membership, $date_info) + 1.0) / $period;
     } else {
-        $ending_month--;
-        if ($ending_month < 1) {
-            $ending_year--;
-            $ending_month += 12;
-        }
+        $fraction = 1;
     }
-    $full = cal_days_in_month(CAL_GREGORIAN, $ending_month, $ending_year);
     $prorated = array(
         'code' => $price['code']
-        , 'value' => ceil($price['value'] * $partial / $full)
+        , 'value' => ceil($due * $fraction)
     );
     return $prorated;
 }
@@ -420,21 +422,12 @@ function billing_prorate ($period_info, $day_of_period, $price) {
  */
 function theme_billing_first_month ($cid) {
     $contact = crm_get_one('contact', array('cid'=>$cid));
-error_log("fix days so far in period");
     // Calculate fraction of the billing period
     $mship = end($contact['member']['membership']);
     $date = getdate(strtotime($mship['start']));
-    $period = billing_days_in_period($date, $mship['plan']['months']);
-    // Day to bill on
-    $day_of_period = $mship['plan']['startday'];
-//error_log(billing_days_remaining(356, $date_info, $mship['plan']['months']));
-    $day = $date['mday'];
-    if($mship['plan']['prorate']==1 && $day_of_period!=0){
-	// originally
-	// $fraction = ($period - $day + 1.0) / $period;
-	//
-error_log("fix this");
-        $fraction = (billing_days_remaining($day_of_period, $date, $mship['plan']['months']) + 1.0) / $period;
+    $period = billing_days_in_period($mship, $date);
+    if($mship['plan']['prorate']==1 && $mship['plan']['baseday']!="0000-00-00"){
+        $fraction = (billing_days_remaining($mship, $date) + 1.0) / $period;
         $html = "<fieldset><legend>First period's prorated dues</legend>";
     } else {
         $fraction = 1;

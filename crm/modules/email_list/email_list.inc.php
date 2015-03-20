@@ -838,13 +838,16 @@ function email_list_delete_form ($lid) {
  */
 function command_email_list_subscribe () {
     $cid = $_POST['cid'];
-    $email = $_POST['email'];
     $lid = $_POST['lid'];
-    
-    //TODO: Qualify the email as a valid email.
-    if (/* email is valid */ true) {
+
+    if (isset($_POST['email'])){
+        $esc_email = mysql_real_escape_string($_POST['email']);
+    } else {
+        error_register('Invalid email. Check email syntax.');
+        return crm_url('contact&cid=' . $cid);
+    }
+    if (filter_var($esc_email, FILTER_VALIDATE_EMAIL)) {
         //save the email
-        $esc_email = mysql_real_escape_string($email);
         $sql = "INSERT INTO `email_list_subscriptions` (`lid`, `cid`, `email`)
             VALUES ('$lid', '$cid', '$esc_email')";
         $res = mysql_query($sql);
