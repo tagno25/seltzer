@@ -327,7 +327,11 @@ function theme_form_textarea ($field) {
     if (!empty($field['class'])) {
         array_push($classes, $field['class']);
     }
-    $output = '<fieldset class="form-row ' . $field['class'] . '">';
+    $output = '<fieldset class="form-row ';
+    if (!empty($field['class'])) {
+        $output .= $field['class'];
+    }
+    $output .= '">';
     if (!empty($field['label'])) {
         $output .= '<label>' . $field['label'] . '</label>';
     }

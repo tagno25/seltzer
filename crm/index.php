@@ -37,7 +37,7 @@ if (!empty($command)) {
     die();
 }
 
-if ($_GET['q'] == 'logout') {
+if (isset($_GET['q']) && $_GET['q'] == 'logout') {
     session_destroy();
 }
 

@@ -70,6 +70,13 @@ $config_theme = "inspire";
 $config_amazon_payment_secret = '';
 $config_amazon_payment_access_key_id = '';
 
+// PayPal config
+$config_paypal_email = '';
+$config_paypal_sandddbox = false;
+
+// Two leter Country Code
+$config_paypal_country = '';
+
 // Base modules
 $config_modules = array(
     "contact",
@@ -99,7 +106,7 @@ $config_modules[] = "billing";
 $config_modules[] = "amazon_payment";
 
 // Paypal integration
-//$config_modules[] = "paypal_payment";
+$config_modules[] = "paypal_payment";
 
 // Assign a profile picture using gravatar
 //$config_modules[] = "profile_picture";
