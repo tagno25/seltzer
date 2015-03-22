@@ -87,7 +87,7 @@ function user_install ($old_revision = 0) {
                 CREATE TABLE IF NOT EXISTS `user` (
                   `cid` mediumint(11) unsigned NOT NULL,
                   `username` varchar(32) NOT NULL,
-                  `hash` varchar(40) NOT NULL DEFAULT '',
+                  `hash` varchar(64) NOT NULL DEFAULT '',
                   `salt` varchar(16) NOT NULL DEFAULT '',
                   PRIMARY KEY (`cid`)
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
@@ -658,8 +658,27 @@ function user_salt () {
  * @return The hash string.
  */
 function user_hash ($password, $salt) {
-    $input = empty($salt) ? $password : $salt . $password;
-    return sha1($input);
+    global $config_password_hash;
+
+    switch ($config_password_hash) {
+        case 'SSHA':
+            $hash = base64_encode(mhash(MHASH_SHA1, $password.$salt).$salt);
+            break;
+        case 'SHA':
+            $hash = base64_encode(mhash(MHASH_SHA1, $password));
+            break;
+        case 'SMD5':
+            $hash = base64_encode(mhash(MHASH_MD5, $password.$salt).$salt);
+            break;
+        case 'MD5':
+            $hash = base64_encode(mhash(MHASH_MD5, $password));
+            break;
+        default: //fallback to SHA1
+            $input = empty($salt) ? $password : $salt . $password;
+            $hash = sha1($input);
+            break;
+    } 
+    return $hash;
 }
 
 // Command Handlers ////////////////////////////////////////////////////////////
