@@ -500,7 +500,7 @@ function payment_delete ($pmtid) {
  *   'cid' - A single cid or array of cids to limit results.
  * @return The associative array mapping cids to payment objects.
  */
-function payment_accounts ($optsa = array()) {
+function payment_accounts ($opts = array()) {
     $cid_to_balance = array();
     // Get credits
     $sql = "

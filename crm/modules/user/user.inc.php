@@ -89,6 +89,7 @@ function user_install ($old_revision = 0) {
                   `username` varchar(32) NOT NULL,
                   `hash` varchar(64) NOT NULL DEFAULT '',
                   `salt` varchar(16) NOT NULL DEFAULT '',
+                  `hashtype` varchar(16) NOT NULL DEFAULT '',
                   PRIMARY KEY (`cid`)
                 ) ENGINE=MyISAM DEFAULT CHARSET=utf8 ROW_FORMAT=DYNAMIC;
             ";
@@ -211,7 +212,7 @@ function user_data ($opts) {
     
     // Construct query for users
     $sql = "
-        SELECT `user`.`cid`, `user`.`username`, `user`.`hash`, `user`.`salt`
+        SELECT `user`.`cid`, `user`.`username`, `user`.`hash`, `user`.`salt`, `user`.`hashtype`
         FROM `user`
         INNER JOIN `contact` ON `contact`.`cid` = `user`.`cid`
         WHERE 1
@@ -495,10 +496,13 @@ function user_check_password($password, $user) {
     global $config_password_hash_read;
 
     if (!empty($user['hash'])) {
-        foreach ($config_password_hash_read as $hash_type) {
-            if (user_hash($password, $user['salt'], $hash_type) === $user['hash']) {
-                return true;
-            }
+        if (!empty($user['hashtype'])) {
+            $hashtype = $user['hashtype'];
+        } else {
+            $hashtype = 'default';
+        }
+        if (user_hash($password, $user['salt'], $hashtype) === $user['hash']) {
+            return true;
         }
     }
     return false;
@@ -817,12 +821,14 @@ function command_reset_password_confirm () {
     $salt = user_salt();
     $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt, $config_password_hash_save));
     $esc_salt = mysql_real_escape_string($salt);
-    
+    $esc_hashtype = mysql_real_escape_string($config_password_hash_save);
+
     // Update password
     $sql = "
         UPDATE `user`
         SET `hash`='$esc_hash'
         , `salt`='$esc_salt'
+        , `hashtype`='$esc_hashtype'
         WHERE `cid`='$esc_cid'
         ";
     $res = mysql_query($sql);
@@ -859,12 +865,14 @@ function command_set_password () {
     $salt = user_salt();
     $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt, $config_password_hash_save));
     $esc_salt = mysql_real_escape_string($salt);
-    
+    $esc_hashtype = mysql_real_escape_string($config_password_hash_save);
+
     // Update password
     $sql = "
         UPDATE `user`
         SET `hash`='$esc_hash'
         , `salt`='$esc_salt'
+        , `hashtype`='$esc_hashtype'
         WHERE `cid`='$esc_cid'
         ";
     $res = mysql_query($sql);
