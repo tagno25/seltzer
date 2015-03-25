@@ -25,7 +25,7 @@
  * this number.
  */
 function user_revision () {
-    return 1;
+    return 2;
 }
 
 /**
@@ -492,9 +492,13 @@ function user_login ($cid) {
  * @param $user The user data structure.
  */
 function user_check_password($password, $user) {
+    global $config_password_hash_read;
+
     if (!empty($user['hash'])) {
-        if (user_hash($password, $user['salt']) === $user['hash']) {
-            return true;
+        foreach ($config_password_hash_read as $hash_type) {
+            if (user_hash($password, $user['salt'], $hash_type) === $user['hash']) {
+                return true;
+            }
         }
     }
     return false;
@@ -657,10 +661,8 @@ function user_salt () {
  * @param $salt
  * @return The hash string.
  */
-function user_hash ($password, $salt) {
-    global $config_password_hash;
-
-    switch ($config_password_hash) {
+function user_hash ($password, $salt, $type) {
+    switch ($type) {
         case 'SSHA':
             $hash = base64_encode(mhash(MHASH_SHA1, $password.$salt).$salt);
             break;
@@ -673,6 +675,7 @@ function user_hash ($password, $salt) {
         case 'MD5':
             $hash = base64_encode(mhash(MHASH_MD5, $password));
             break;
+        case 'default':
         default: //fallback to SHA1
             $input = empty($salt) ? $password : $salt . $password;
             $hash = sha1($input);
@@ -789,7 +792,8 @@ function command_reset_password () {
 */
 function command_reset_password_confirm () {
     global $esc_post;
-    
+    global $config_password_hash_save;
+
     // Check code
     if (!user_check_reset_code($_POST['code'])) {
         error_register('Invalid reset code');
@@ -811,7 +815,7 @@ function command_reset_password_confirm () {
     
     // Calculate hash
     $salt = user_salt();
-    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt));
+    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt, $config_password_hash_save));
     $esc_salt = mysql_real_escape_string($salt);
     
     // Update password
@@ -836,7 +840,8 @@ function command_reset_password_confirm () {
 */
 function command_set_password () {
     global $esc_post;
-    
+    global $config_password_hash_save;
+
     // Check that passwords match
     if ($_POST['password'] != $_POST['confirm']) {
         error_register('Passwords do not match');
@@ -852,7 +857,7 @@ function command_set_password () {
     
     // Calculate hash
     $salt = user_salt();
-    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt));
+    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt, $config_password_hash_save));
     $esc_salt = mysql_real_escape_string($salt);
     
     // Update password

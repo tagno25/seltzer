@@ -68,8 +68,11 @@ $config_theme = "inspire";
 
 // Password encoding type
 // (supported values are "MD5", "SMD5", "SHA", "SSHA",
-//     or blank for old sha1 style)
-$config_password_hash = "";
+//     or "default" for old sha1 style)
+$config_password_hash_save = "default";
+// Password array for login
+// (allows for transitioning between hashes)
+$config_password_hash_read = ["default"];
 
 // Amazon signatures version 2 keys
 $config_amazon_payment_secret = '';
