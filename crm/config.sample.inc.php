@@ -66,6 +66,11 @@ $config_base_path = '/crm/';
 // (currently there is only one, "inspire".)
 $config_theme = "inspire";
 
+// Password encoding type
+// (supported values are "MD5", "SMD5", "SHA", "SSHA",
+//     or "default" for old sha1 style)
+$config_password_hash_save = "default";
+
 // Amazon signatures version 2 keys
 $config_amazon_payment_secret = '';
 $config_amazon_payment_access_key_id = '';

@@ -320,10 +320,8 @@ function command_member_membership_delete () {
         error_register('Permission denied: member_membership_edit');
         return crm_url('members');
     }
-    
     // Delete membership
     member_membership_delete($esc_post['sid']);
-    
     return crm_url("contact&cid=$_POST[cid]");
 }
 
