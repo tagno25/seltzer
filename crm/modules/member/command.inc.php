@@ -156,6 +156,7 @@ function command_member_plan_add () {
         , 'baseday' => $_POST['baseday']
         , 'voting' => $_POST['voting'] ? '1' : '0'
         , 'active' => $_POST['active'] ? '1' : '0'
+        , 'pid' => $_POST['pid']
         , 'prorate' => $_POST['prorate'] ? '1' : '0'
     );
     
@@ -314,7 +315,7 @@ function command_member_membership_update () {
  */
 function command_member_membership_delete () {
     global $esc_post;
-    
+
     // Verify permissions
     if (!user_access('member_membership_edit')) {
         error_register('Permission denied: member_membership_edit');

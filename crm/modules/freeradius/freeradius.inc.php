@@ -158,7 +158,7 @@ function freeradius_page (&$page_data, $page_name, $options) {
 /**
  * Run radius for a single membership.
  * @param $membership The membership to bill.
- lling_bill_membership*/
+*/
 function freeradius_add_member ($user) {
     global $config_password_hash_save;
     global $config_radius_host;
@@ -231,38 +231,4 @@ function freeradius_del_member ($user) {
     } catch (PDOException $ex) {
         die(mysql_error());
     }
-}
-
-// Themes //////////////////////////////////////////////////////////////////////
-
-/**
- * Return themed html for first month button.
- */
-function theme_freeradius_first_month ($cid) {
-    $contact = crm_get_one('contact', array('cid'=>$cid));
-    // Calculate fraction of the radius period
-    $mship = end($contact['member']['membership']);
-    $date = getdate(strtotime($mship['start']));
-    if($mship['plan']['prorate']==1 && $mship['plan']['baseday']!="0000-00-00"){
-        $html = "<fieldset><legend>First period's prorated dues</legend>";
-    } else {
-        $html = "<fieldset><legend>First period's dues</legend>";
-    }
-    // Get payment amount
-    $html .= '</fieldset>';
-    return $html;
-}
-
-/**
- * Return an account summary and payment button.
- * @param $cid The cid of the contact to create a form for.
- * @return An html string for the summary and button.
- */
-function theme_radius_account_info ($cid) {
-    $balances = payment_accounts(array('cid'=>$cid));
-    $balance = $balances[$cid];
-    $output = '<div>';
-    $output .= "<p><strong>No balance owed.  Account credit:</strong></p>";
-    $output .= '</div>';
-    return $output;
 }

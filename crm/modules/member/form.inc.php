@@ -458,7 +458,8 @@ function member_membership_delete_form ($sid) {
         'method' => 'post',
         'command' => 'member_membership_delete',
         'hidden' => array(
-            'sid' => $membership['sid']
+            'sid' => $membership['sid'],
+            'cid' => $membership['cid']
         ),
         'fields' => array(
             array(

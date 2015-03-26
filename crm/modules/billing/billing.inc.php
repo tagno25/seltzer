@@ -262,7 +262,7 @@ function billing_page (&$page_data, $page_name, $options) {
  * @param $membership The membership to bill.
  * @param $until Bill up to and including this day.
  * @param $after Start billing after this day or beginning of time if not given.
- lling_bill_membership*/
+*/
 function billing_bill_membership ($membership, $until, $after = '') {
     $price = payment_parse_currency($membership['plan']['price']);
     $price['value'] *= -1;
@@ -422,7 +422,11 @@ function billing_prorate ($membership, $date_info, $price) {
  */
 function theme_billing_first_month ($cid) {
     $contact = crm_get_one('contact', array('cid'=>$cid));
-    // Calculate fraction of the billing period
+    // Calculate fraction of the billing perioda
+    if (!isset($contact['member']['membership'][0])){
+        // No plan, so return nothing
+        return "";
+    }
     $mship = end($contact['member']['membership']);
     $date = getdate(strtotime($mship['start']));
     $period = billing_days_in_period($mship, $date);
@@ -469,6 +473,15 @@ function theme_billing_first_month ($cid) {
  * @return An html string for the summary and button.
  */
 function theme_billing_account_info ($cid) {
+    $contact = crm_get_one('contact', array('cid'=>$cid));
+    // Calculate fraction of the billing perioda
+    if (!isset($contact['member']['membership'][0])){
+        $output = '<div>';
+        $output .= "<p><strong>No plan setup.</strong></p>";
+        $output .= '</div>';
+        return $output;
+    }
+
     $balances = payment_accounts(array('cid'=>$cid));
     $balance = $balances[$cid];
     $params = array(

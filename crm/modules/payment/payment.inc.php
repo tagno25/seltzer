@@ -507,7 +507,6 @@ function payment_accounts ($opts = array()) {
         SELECT `credit`, `code`, SUM(`value`) AS `value` FROM `payment` WHERE `credit` <> 0
     ";
     foreach ($opts as $key => $value) {
-error_log($key.": ".$value);
         switch ($key) {
             case 'cid':
                 if (is_array($value)) {
@@ -525,7 +524,6 @@ error_log($key.": ".$value);
         }
     }
     $sql .= " GROUP BY `credit`, `code` ";
-error_log($sql);
     $res = mysql_query($sql);
     if (!$res) crm_error(mysql_error());
     $db_row = mysql_fetch_assoc($res);
