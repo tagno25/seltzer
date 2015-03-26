@@ -256,6 +256,7 @@ function module_upgrade_form () {
  */
 function command_module_install () {
     global $esc_post;
+    global $config_password_hash_save;
     
     // Create tables
     $res = module_install();
@@ -276,13 +277,14 @@ function command_module_install () {
     $esc_cid = mysql_real_escape_string($cid);
     
     $salt = user_salt();
-    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt));
+    $esc_hash = mysql_real_escape_string(user_hash($_POST['password'], $salt, $config_password_hash_save));
     $esc_salt = mysql_real_escape_string($salt);
+    $esc_hashtype = mysql_real_escape_string($config_password_hash_save);
     $sql = "
         INSERT INTO `user`
-        (`cid`, `username`, `hash`, `salt`)
+        (`cid`, `username`, `hash`, `salt`, `hashtype`)
         VALUES
-        ('$esc_cid', 'admin', '$esc_hash', '$esc_salt')
+        ('$esc_cid', 'admin', '$esc_hash', '$esc_salt', '$esc_hashtype')
     ";
     $res = mysql_query($sql);
     if (!$res) die(mysql_error());

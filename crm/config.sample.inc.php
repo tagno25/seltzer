@@ -26,6 +26,12 @@ $config_db_user = '';
 $config_db_password = '';
 $config_db_db = '';
 
+// Radius Database configuration
+$config_radius_host = 'localhost';
+$config_radius_user = '';
+$config_radius_password = '';
+$config_radius_db = '';
+
 // Site info
 
 // The title to display in the title bar
@@ -118,6 +124,9 @@ $config_modules[] = "paypal_payment";
 
 // Assign members a mentor
 //$config_modules[] = "mentor";
+
+// Freeradius updating
+//$config_modules[] = "freeradius";
 
 // Developer tools
 //$config_modules[] = "devel";

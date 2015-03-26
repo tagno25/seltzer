@@ -493,8 +493,6 @@ function user_login ($cid) {
  * @param $user The user data structure.
  */
 function user_check_password($password, $user) {
-    global $config_password_hash_read;
-
     if (!empty($user['hash'])) {
         if (!empty($user['hashtype'])) {
             $hashtype = $user['hashtype'];
