@@ -1,10 +1,10 @@
-base_url: http://localhost/
+base_url: http://localhost/crm/
 
 mysql:
   host: localhost
   database: seltzerdb
-  username: seltzer
-  password: 6rtfhgvh8y7t6rt
+  username: crm
+  password: crm
   test_data: features/support/testdata.sql
 
 users:
