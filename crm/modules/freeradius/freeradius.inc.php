@@ -43,7 +43,29 @@ function freeradius_permissions () {
 function freeradius_install($old_revision = 0) {
     // Create initial database table
     if ($old_revision < 1) {
-        // TODO
+        global $config_password_hash_save;
+        global $config_radius_host;
+        global $config_radius_user;
+        global $config_radius_password;
+        global $config_radius_db;
+
+        try {
+            $db = new PDO('mysql:dbname='.$config_radius_db.';host='.$config_radius_host, $config_radius_user, $config_radius_password);
+        } catch (PDOException $ex) {
+            die(mysql_error());
+        }
+
+        try {
+            $stmt = $db->prepare("INSERT INTO radgroupreply (groupname, attribute, op, value)
+                VALUES ('seltzer','Framed-Compression',':=','Van-Jacobsen-TCP-IP'),
+                ('seltzer','Framed-Protocol',':=','PPP'),
+                ('seltzer','Service-Type',':=','Framed-User'),
+                ('seltzer','Acct-Interim-Interval','=','60')");
+            $stmt->execute();
+        } catch (PDOException $ex) {
+            die(mysql_error());
+        }
+
     }
 }
 
@@ -209,6 +231,17 @@ function freeradius_add_member ($user) {
     } catch (PDOException $ex) {
         die(mysql_error());
     }
+    try {
+        $stmt = $db->prepare("DELETE FROM `radusergroup` WHERE `username`=:username");
+        $stmt->bindParam(':username', $esc_user);
+        $stmt->execute();
+        $stmt = $db->prepare("INSERT INTO radusergroup (username, groupname, priority)
+            VALUES (:username,'seltzer',1)");
+        $stmt->bindParam(':username', $esc_user);
+        $stmt->execute();
+    } catch (PDOException $ex) {
+        die(mysql_error());
+    }
 }
 
 function freeradius_del_member ($user) {
@@ -224,9 +257,17 @@ function freeradius_del_member ($user) {
     }
 
     $esc_cid = mysql_real_escape_string($user['cid']);
+    $esc_user = mysql_real_escape_string($user['username']);
     try {
         $stmt = $db->prepare("DELETE FROM `radcheck` WHERE `id`=:id");
         $stmt->bindParam(':id', $esc_cid);
+        $stmt->execute();
+    } catch (PDOException $ex) {
+        die(mysql_error());
+    }
+    try {
+        $stmt = $db->prepare("DELETE FROM `radusergroup` WHERE `username`=:username");
+        $stmt->bindParam(':username', $esc_user);
         $stmt->execute();
     } catch (PDOException $ex) {
         die(mysql_error());

@@ -54,6 +54,13 @@ function register_form () {
     
     // Start with contact form
     $form = crm_get_form('contact');
+
+    foreach ($_GET as $key => $value) {
+        if ($key=='q') {
+        } elseif (is_string($value)) {
+            $form['values'][$key] = $value;
+        }
+    }
     
     // Generate default start date, first of current month
     $start = date("Y-m-d");
@@ -62,6 +69,23 @@ function register_form () {
     $form['command'] = 'register';
     $form['submit'] = 'Register';
     
+    foreach ($form['fields'][0]['fields'] as $key1 => $value1) {
+        foreach ($value1 as $key2 => $value2) {
+            if (is_string($value2)) {
+                switch($value2) {
+                    case "First Name":
+                    case "Last Name":
+                    case "Email":
+                    case "Phone":
+                    case "Emergency Contact":
+                    case "Emergency Phone":
+                        $form['fields'][0]['fields'][$key1][$key2]=$value2."*";
+                        break;
+                }
+            }
+        }
+    }
+
     // Add member data
     $form['fields'][] = array(
         'type' => 'fieldset',
@@ -78,9 +102,9 @@ function register_form () {
         'type' => 'fieldset',
         'label' => 'Membership Info',
         'fields' => array(
-            array(
+            array(	
                 'type' => 'select',
-                'label' => 'Plan',
+                'label' => 'Plan*',
                 'name' => 'pid',
                 'selected' => '',
                 'options' => member_plan_options(array('filter'=>array('active'=>true)))
@@ -112,10 +136,44 @@ function command_register () {
     // Find username or create a new one
     $username = $_POST['username'];
     $n = 0;
+
+    $query=array();
+
+    foreach ($esc_post as $key => $value) {
+        if ($key == "command") {
+        } elseif (is_string($value)) {
+            $query[$key] = $value;
+        }
+    }
+
+    if (empty($esc_post['firstName'])) {
+        error_register('Please specify a first name');
+        return crm_url('register', array('query'=>$query));
+    } elseif (empty($esc_post['lastName'])) {
+        error_register('Please specify a last name');
+        return crm_url('register', array('query'=>$query));
+    } elseif (empty($esc_post['email'])) {
+        error_register('Please specify an email address');
+        return crm_url('register', array('query'=>$query));
+    } elseif (!filter_var($esc_post['email'], FILTER_VALIDATE_EMAIL)) {
+        error_register('Please specify a valid email address');
+        return crm_url('register', array('query'=>$query));
+    } elseif (empty($esc_post['phone'])) {
+        error_register('Please specify your phone number');
+        return crm_url('register', array('query'=>$query));
+    } elseif (empty($esc_post['emergencyName'])) {
+        error_register('Please specify an emergency contact name');
+        return crm_url('register', array('query'=>$query));
+    } elseif (empty($esc_post['emergencyPhone'])) {
+        error_register('Please specify an emergency contact phone number');
+        return crm_url('register', array('query'=>$query));
+    }
+
+
     while (empty($username) && $n < 100) {
         
         // Construct test username
-        $test_username = strtolower($_POST[firstName]{0} . $_POST[lastName]);
+        $test_username = strtolower($_POST['firstName']{0} . $_POST['lastName']);
         if ($n > 0) {
             $test_username .= $n;
         }
@@ -133,6 +191,7 @@ function command_register () {
     }
     if (empty($username)) {
         error_register('Please specify a username');
+        global $_POST;
         return crm_url('register');
     }
     
